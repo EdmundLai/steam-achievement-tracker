@@ -1,0 +1,13 @@
+﻿@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Welcome to Steam Achievement Tracker!</h1>
+
+<form >
+    <p>
+        <input type="text" name="steamId">
+        <input asp-controller="Steam" asp-action="GetOwnedGames" type="submit" value="Search" />
+    </p>
+</form>

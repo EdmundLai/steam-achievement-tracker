@@ -1,0 +1,57 @@
+﻿@model SteamAchievementTracker.Models.GamesPlayed
+@{
+    ViewData["Title"] = "Get Owned Games";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Games by Playtime</h1>
+
+@*<ol>
+    @foreach (var game in Model.GameInfos)
+    {
+        <li>
+            <span>@game.GameName</span>-
+            <span>@game.AppId</span>
+            <span>@game.GamePlaytime</span> hours
+            <span>@game.AchievementStats.AchievementPercentage</span> % of Achievements
+        </li>
+    }
+</ol>*@
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Game Name
+            </th>
+            <th>
+                Hours Played
+            </th>
+            <th>
+                Number of total achievements
+            </th>
+            <th>
+                Achievement Percentage
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var item in Model.GameInfos)
+        {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.GameName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.GamePlaytime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AchievementStats.NumGameAchievements)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AchievementStats.AchievementPercentage) %
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>
