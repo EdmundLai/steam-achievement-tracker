@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using SteamAchievementTracker.Services;
 
 namespace SteamAchievementTracker
 {
@@ -24,9 +23,6 @@ namespace SteamAchievementTracker
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var config = new AppConfiguration();
-            config.ApiKey = Configuration["SteamAchievementTracker:ApiKey"];
-            services.AddSingleton<AppConfiguration>(config);
             services.AddControllersWithViews();
         }
 

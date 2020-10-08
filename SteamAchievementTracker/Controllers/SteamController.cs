@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SteamAchievementTracker.Models;
-using SteamAchievementTracker.Services;
+using Microsoft.Extensions.Configuration;
 
 namespace SteamAchievementTracker.Controllers
 {
@@ -18,13 +18,13 @@ namespace SteamAchievementTracker.Controllers
 
         private static readonly HttpClient HttpClient;
 
-        AppConfiguration _config;
+        private static IConfiguration _configuration;
         
         private string ApiKey 
         {
             get
             {
-                return _config.ApiKey;
+                return _configuration["APIKEY"];
             }
         }
 
@@ -36,9 +36,9 @@ namespace SteamAchievementTracker.Controllers
             
         }
 
-        public SteamController(AppConfiguration config)
+        public SteamController(IConfiguration configuration)
         {
-            _config = config;
+            _configuration = configuration;
         }
 
         public IActionResult Index()
