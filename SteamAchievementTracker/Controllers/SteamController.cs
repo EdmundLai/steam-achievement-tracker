@@ -10,6 +10,9 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SteamAchievementTracker.Models;
 using Microsoft.Extensions.Configuration;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
+using Azure.Core;
 
 
 namespace SteamAchievementTracker.Controllers
@@ -19,15 +22,36 @@ namespace SteamAchievementTracker.Controllers
 
         private static readonly HttpClient HttpClient;
 
-        private static IConfiguration _configuration;
+        //private static IConfiguration _configuration;
         
         private string ApiKey 
         {
             get
             {
                 
-                return "";
+                return GetApiKey();
             }
+        }
+
+        public string GetApiKey()
+        {
+            SecretClientOptions options = new SecretClientOptions()
+            {
+                Retry =
+                    {
+                        Delay= TimeSpan.FromSeconds(2),
+                        MaxDelay = TimeSpan.FromSeconds(16),
+                        MaxRetries = 5,
+                        Mode = RetryMode.Exponential
+                    }
+            };
+            var client = new SecretClient(new Uri("https://steamachievementtracker.vault.azure.net/"), new DefaultAzureCredential(), options);
+
+            KeyVaultSecret secret = client.GetSecret("APIKEY");
+
+            string secretValue = secret.Value;
+
+            return secretValue;
         }
 
         private static List<AppInfo> GameList { get; set; }
