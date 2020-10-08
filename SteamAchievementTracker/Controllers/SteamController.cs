@@ -11,6 +11,7 @@ using Newtonsoft.Json.Linq;
 using SteamAchievementTracker.Models;
 using Microsoft.Extensions.Configuration;
 
+
 namespace SteamAchievementTracker.Controllers
 {
     public class SteamController : Controller
@@ -24,7 +25,8 @@ namespace SteamAchievementTracker.Controllers
         {
             get
             {
-                return _configuration["APIKEY"];
+                
+                return "";
             }
         }
 

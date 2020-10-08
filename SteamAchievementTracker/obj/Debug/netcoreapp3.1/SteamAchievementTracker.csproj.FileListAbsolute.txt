@@ -119,5 +119,13 @@ C:\Users\qwert\source\repos\SteamAchievementTracker\SteamAchievementTracker\bin\
 C:\Users\qwert\source\repos\SteamAchievementTracker\SteamAchievementTracker\bin\Debug\netcoreapp3.1\Microsoft.IdentityModel.Clients.ActiveDirectory.dll
 C:\Users\qwert\source\repos\SteamAchievementTracker\SteamAchievementTracker\bin\Debug\netcoreapp3.1\Microsoft.Rest.ClientRuntime.dll
 C:\Users\qwert\source\repos\SteamAchievementTracker\SteamAchievementTracker\bin\Debug\netcoreapp3.1\Microsoft.Rest.ClientRuntime.Azure.dll
+C:\Users\qwert\source\repos\SteamAchievementTracker\SteamAchievementTracker\bin\Debug\netcoreapp3.1\Azure.Core.dll
+C:\Users\qwert\source\repos\SteamAchievementTracker\SteamAchievementTracker\bin\Debug\netcoreapp3.1\Azure.Identity.dll
+C:\Users\qwert\source\repos\SteamAchievementTracker\SteamAchievementTracker\bin\Debug\netcoreapp3.1\Microsoft.Bcl.AsyncInterfaces.dll
+C:\Users\qwert\source\repos\SteamAchievementTracker\SteamAchievementTracker\bin\Debug\netcoreapp3.1\Microsoft.Identity.Client.dll
+C:\Users\qwert\source\repos\SteamAchievementTracker\SteamAchievementTracker\bin\Debug\netcoreapp3.1\Microsoft.Identity.Client.Extensions.Msal.dll
+C:\Users\qwert\source\repos\SteamAchievementTracker\SteamAchievementTracker\bin\Debug\netcoreapp3.1\System.Security.Cryptography.ProtectedData.dll
+C:\Users\qwert\source\repos\SteamAchievementTracker\SteamAchievementTracker\bin\Debug\netcoreapp3.1\runtimes\win\lib\netstandard2.0\System.Security.Cryptography.ProtectedData.dll
+C:\Users\qwert\source\repos\SteamAchievementTracker\SteamAchievementTracker\bin\Debug\netcoreapp3.1\Azure.Security.KeyVault.Secrets.dll
 C:\Users\qwert\source\repos\SteamAchievementTracker\SteamAchievementTracker\obj\Debug\netcoreapp3.1\SteamAchievementTracker.csproj.CoreCompileInputs.cache
 C:\Users\qwert\source\repos\SteamAchievementTracker\SteamAchievementTracker\obj\Debug\netcoreapp3.1\SteamAchievementTracker.MvcApplicationPartsAssemblyInfo.cache
