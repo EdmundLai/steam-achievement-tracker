@@ -62,11 +62,6 @@ namespace SteamAchievementTracker.Controllers
             
         }
 
-        public SteamController(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
-
         public IActionResult Index()
         {
             return View();
