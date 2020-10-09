@@ -5,12 +5,24 @@
 
 <h1>Welcome to Steam Achievement Tracker!</h1>
 
+<h2>Look up any user's profile info using their steam ID!</h2>
 
 <p>Please enter your steam ID (or custom url):</p>
 <form >
-
     <p>
         <input type="text" name="steamId" placeholder="76561198055381702">
         <input asp-controller="Steam" asp-action="GetOwnedGames" type="submit" value="Search" />
+    </p>
+</form>
+
+<h2>Compare the games you have in common with your friends!</h2>
+
+<p>Please enter the two steam IDs (or custom url(s)) below:</p>
+
+<form>
+    <p>
+        <input type="text" name="steamId1" placeholder="76561198055381702">
+        <input type="text" name="steamId2" placeholder="porkythepig">
+        <input asp-controller="Steam" asp-action="GetGamesInCommon" type="submit" value="Search" />
     </p>
 </form>

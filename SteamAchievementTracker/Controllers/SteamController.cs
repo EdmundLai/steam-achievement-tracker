@@ -51,6 +51,19 @@ namespace SteamAchievementTracker.Controllers
             System.Diagnostics.Debug.WriteLine(msg);
         }
 
+        public async Task<string> GetSteamName(string steamId)
+        {
+            var processedSteamId = await ProcessSteamId(steamId);
+            var profileInfo = await GetProfileInfo(processedSteamId);
+
+            if(profileInfo != null)
+            {
+                return (string) profileInfo["personaname"];
+            }
+
+            return "";
+        }
+
         public async Task<JObject> GetProfileInfo(string steamId)
         {
             // Call asynchronous network methods in a try/catch block to handle exceptions.
@@ -260,6 +273,7 @@ namespace SteamAchievementTracker.Controllers
             return processedSteamId;
         }
 
+        // Retrieving games for the provided steam ID or customurl
         public async Task<IActionResult> GetOwnedGames(string steamId)
         {
             // Call asynchronous network methods in a try/catch block to handle exceptions.
@@ -283,6 +297,125 @@ namespace SteamAchievementTracker.Controllers
                     return Content("User's profile is set to private.");
                 }
 
+                var allGamesPlayed = await GetGamesPlayedByUser(processedSteamId, true);
+                if(allGamesPlayed == null)
+                {
+                    return Content("Some error occurred in retrieving games for that steam ID.");
+                }
+
+                return View(allGamesPlayed);
+            }
+            catch (HttpRequestException e)
+            {
+                DebugLog("\nException Caught!");
+                DebugLog("From GetOwnedGames");
+                DebugLog($"Message :{e.Message}");
+                //var error = JsonConvert.DeserializeObject(e.Message);
+                return Content(e.Message);
+            }
+        }
+
+        // Want to be able to display games that each person has in common with other person
+        // Should be able to also see playtimes of each person ???? (maybe)
+        public async Task<IActionResult> GetGamesInCommon(string steamId1, string steamId2)
+        {
+            try
+            {
+                var gamesPlayedUser1 = await GetGamesPlayedByUser(steamId1, false);
+                var gamesPlayedUser2 = await GetGamesPlayedByUser(steamId2, false);
+
+                if (gamesPlayedUser1 == null || gamesPlayedUser2 == null)
+                {
+                    if(gamesPlayedUser1 == null && gamesPlayedUser2 == null)
+                    {
+                        return Content($"{steamId1} and {steamId2} both had issues retrieving data associated with their accounts.");
+                    }
+                    if(gamesPlayedUser1 == null)
+                    {
+                        return Content($"{steamId1} either has a private profile, steam user with that id does not exist, or some other error occurred.");
+                    }
+                    if (gamesPlayedUser2 == null)
+                    {
+                        return Content($"{steamId2} either has a private profile, steam user with that id does not exist, or some other error occurred.");
+                    }
+
+                }
+
+                var gameInfos1 = gamesPlayedUser1.GameInfos;
+                var gameInfos2 = gamesPlayedUser2.GameInfos;
+
+                var gamesInCommonList = new List<CommonGame>();
+
+                // key is game name, int is hours of playtime
+                var gameDict = new Dictionary<string, int>();
+
+                foreach (GameInfo gameInfo in gameInfos1)
+                {
+                    gameDict.Add(gameInfo.GameName, gameInfo.GamePlaytime);
+                }
+
+                foreach (GameInfo gameInfo in gameInfos2)
+                {
+                    if (gameDict.ContainsKey(gameInfo.GameName))
+                    {
+                        CommonGame commonGame = new CommonGame
+                        {
+                            GameName = gameInfo.GameName,
+                            PlaytimeUser1 = gameDict[gameInfo.GameName],
+                            PlaytimeUser2 = gameInfo.GamePlaytime
+                        };
+                        gamesInCommonList.Add(commonGame);
+                    }
+                }
+
+                var gamesInCommon = new GamesInCommon
+                {
+                    SteamName1 = await GetSteamName(steamId1),
+                    SteamName2 = await GetSteamName(steamId2),
+                    CommonGames = gamesInCommonList
+                };
+
+                return View(gamesInCommon);
+            }
+            catch
+            {
+                DebugLog("\nException Caught!");
+                DebugLog("From GetGamesInCommon");
+                return Content("Error while calculating games that users share.");
+            }
+            
+        }
+
+
+        public async Task<GamesPlayed> GetGamesPlayedByUser(string steamId, bool isProcessed)
+        {
+            try
+            {
+                string processedSteamId;
+
+                if(!isProcessed)
+                {
+                    DebugLog($"original steamId: {steamId}");
+
+                    processedSteamId = await ProcessSteamId(steamId);
+
+                    DebugLog($"processed Steam Id: {processedSteamId}");
+
+                    dynamic profileInfo = await GetProfileInfo(processedSteamId);
+                    if (profileInfo == null)
+                    {
+                        return null;
+                    }
+
+                    if (profileInfo["communityvisibilitystate"] != 3)
+                    {
+                        return null;
+                    }
+                } else
+                {
+                    processedSteamId = steamId;
+                }
+
                 string apiURL = $"http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key={ApiKey}&steamid={processedSteamId}&format=json";
                 string responseBody = await HttpClient.GetStringAsync(apiURL);
 
@@ -295,24 +428,9 @@ namespace SteamAchievementTracker.Controllers
                 //DebugLog($"Type of games Array: {gamesArray.GetType()}");
 
                 List<GameTimePlayed> gamesList = gamesArray.ToObject<List<GameTimePlayed>>();
-                List<GameInfo> gameInfos = new List<GameInfo>();
 
-                List<Task<GameInfo>> tasks = new List<Task<GameInfo>>();
+                List<GameInfo> gameInfos = await ConvertGameTimePlayedListToGameInfoList(gamesList, steamId);
 
-
-                foreach (GameTimePlayed game in gamesList)
-                {
-                    var task = ConvertGameTimePlayedToGameInfo(game, steamId);
-                    tasks.Add(task);
-                }
-
-                await Task.WhenAll(tasks);
-
-                foreach(var task in tasks)
-                {
-                    var gameInfo = task.Result;
-                    gameInfos.Add(gameInfo);
-                }
 
                 var ordGameInfos = gameInfos.OrderByDescending(gameInfo => gameInfo.GamePlaytime).ToList();
 
@@ -322,17 +440,17 @@ namespace SteamAchievementTracker.Controllers
 
                 //ViewData["GamesPlayed"] = gamesListOrdByPlaytime;
 
-               var allGamesPlayed = new GamesPlayed
-               {
-                   GameInfos = ordGameInfos
-               };
+                var allGamesPlayed = new GamesPlayed
+                {
+                    GameInfos = ordGameInfos
+                };
 
                 //dynamic achObj = await GetAchievementsForGame(99900);
 
                 //DebugLog($"Game name: {achObj["playerstats"]["gameName"]}");
 
-                return View(allGamesPlayed);
-                
+                return allGamesPlayed;
+
 
                 //return Content("Player with that id does not exist.");
 
@@ -340,11 +458,36 @@ namespace SteamAchievementTracker.Controllers
             catch (HttpRequestException e)
             {
                 DebugLog("\nException Caught!");
-                DebugLog("From GetOwnedGames");
+                DebugLog("From GetGamesPlayedByUser");
                 DebugLog($"Message :{e.Message}");
                 //var error = JsonConvert.DeserializeObject(e.Message);
-                return Content(e.Message);
+                // returm empty list
+                return null;
             }
+        }
+
+        public async Task<List<GameInfo>> ConvertGameTimePlayedListToGameInfoList(List<GameTimePlayed> gamesList, string steamId)
+        {
+            List<GameInfo> gameInfos = new List<GameInfo>();
+
+            List<Task<GameInfo>> tasks = new List<Task<GameInfo>>();
+
+
+            foreach (GameTimePlayed game in gamesList)
+            {
+                var task = ConvertGameTimePlayedToGameInfo(game, steamId);
+                tasks.Add(task);
+            }
+
+            await Task.WhenAll(tasks);
+
+            foreach (var task in tasks)
+            {
+                var gameInfo = task.Result;
+                gameInfos.Add(gameInfo);
+            }
+
+            return gameInfos;
         }
 
         public async Task<JObject> GetAchievementsForGame(int appid, string steamId)
