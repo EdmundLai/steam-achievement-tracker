@@ -16,16 +16,30 @@ namespace SteamAchievementTracker
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             Configuration = configuration;
+            HostingEnvironment = environment;
         }
 
         public IConfiguration Configuration { get; }
 
+        public IWebHostEnvironment HostingEnvironment { get; }
+
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            ApiKeyService keyService;
+            if (HostingEnvironment.IsDevelopment())
+            {
+                keyService = new ApiKeyService(Configuration["SteamAchievementTracker:ApiKey"]);
+                
+            } else
+            {
+                keyService = new ApiKeyService();
+            }
+
+            services.AddSingleton<IApiKeyService>(keyService);
             services.AddControllersWithViews();
         }
 
