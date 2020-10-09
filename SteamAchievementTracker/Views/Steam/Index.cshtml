@@ -5,9 +5,12 @@
 
 <h1>Welcome to Steam Achievement Tracker!</h1>
 
+
+<p>Please enter your steam ID (or custom url):</p>
 <form >
+
     <p>
-        <input type="text" name="steamId">
+        <input type="text" name="steamId" placeholder="76561198055381702">
         <input asp-controller="Steam" asp-action="GetOwnedGames" type="submit" value="Search" />
     </p>
 </form>

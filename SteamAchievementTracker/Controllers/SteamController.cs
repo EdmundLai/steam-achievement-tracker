@@ -56,12 +56,8 @@ namespace SteamAchievementTracker.Controllers
             // Call asynchronous network methods in a try/catch block to handle exceptions.
             try
             {
-                //string steamId = "76561198055381702";
-                HttpResponseMessage response = await HttpClient.GetAsync($"http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={ApiKey}&steamids={steamId}");
-                response.EnsureSuccessStatusCode();
-                string responseBody = await response.Content.ReadAsStringAsync();
-                // Above three lines can be replaced with new helper method below
-                // string responseBody = await client.GetStringAsync(uri);
+                string apiURL = $"http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={ApiKey}&steamids={steamId}";
+                string responseBody = await HttpClient.GetStringAsync(apiURL);
 
                 dynamic playerDetails = JsonConvert.DeserializeObject(responseBody);
 
@@ -94,11 +90,7 @@ namespace SteamAchievementTracker.Controllers
             try
             {
                 string apiURL = $"http://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?key={ApiKey}&appid={appid}";
-                HttpResponseMessage response = await HttpClient.GetAsync(apiURL);
-                response.EnsureSuccessStatusCode();
-                string responseBody = await response.Content.ReadAsStringAsync();
-                // Above three lines can be replaced with new helper method below
-                // string responseBody = await client.GetStringAsync(uri);
+                string responseBody = await HttpClient.GetStringAsync(apiURL);
 
                 // gamesOwnedDetails is of JObject type
                 dynamic gamesOwnedDetails = JsonConvert.DeserializeObject(responseBody);
@@ -125,11 +117,7 @@ namespace SteamAchievementTracker.Controllers
             try
             {
                 string apiURL = $"https://store.steampowered.com/api/appdetails?appids={appid}";
-                HttpResponseMessage response = await HttpClient.GetAsync(apiURL);
-                response.EnsureSuccessStatusCode();
-                string responseBody = await response.Content.ReadAsStringAsync();
-                // Above three lines can be replaced with new helper method below
-                // string responseBody = await client.GetStringAsync(uri);
+                string responseBody = await HttpClient.GetStringAsync(apiURL);
 
                 // gamesOwnedDetails is of JObject type
                 dynamic gameStorePage = JsonConvert.DeserializeObject(responseBody);
@@ -154,11 +142,7 @@ namespace SteamAchievementTracker.Controllers
             try
             {
                 string apiURL = $"http://api.steampowered.com/ISteamApps/GetAppList/v0002/";
-                HttpResponseMessage response = await HttpClient.GetAsync(apiURL);
-                response.EnsureSuccessStatusCode();
-                string responseBody = await response.Content.ReadAsStringAsync();
-                // Above three lines can be replaced with new helper method below
-                // string responseBody = await client.GetStringAsync(uri);
+                string responseBody = await HttpClient.GetStringAsync(apiURL);
 
                 // gamesOwnedDetails is of JObject type
                 dynamic appList = JsonConvert.DeserializeObject(responseBody);
@@ -186,35 +170,10 @@ namespace SteamAchievementTracker.Controllers
             {
                 string json = r.ReadToEnd();
                 dynamic jsonData = JsonConvert.DeserializeObject(json);
-                //if(jsonData == null)
-                //{
-                //    DebugLog("WE NULL BOIS");
-                //} else
-                //{
-                //    DebugLog("WE NOT NULL BOIS");
-                //    DebugLog($"{jsonData["applist"]["apps"].GetType()}");
-                //}
                 DebugLog($"{jsonData["applist"]["apps"].Count}");
                 GameList = jsonData["applist"]["apps"].ToObject<List<AppInfo>>();
             }
         }
-
-        // this is a bad idea. the load is too large
-        // memory is going to 1 GB
-        // very bad very bad
-        // DONT USE THIS IT WILL BREAK
-        //public async Task<SteamController> InitializeAsync()
-        //{
-        //    dynamic appList = await GetAppList();
-
-        //    if (appList != null)
-        //    {
-        //        DebugLog($"{appList["applist"]["apps"].Count}");
-        //        GameList = appList["applist"]["apps"].ToObject<List<AppInfo>>();
-        //    }
-
-        //    return this;
-        //}
 
         public string GetGameName(int appid)
         {
@@ -254,11 +213,7 @@ namespace SteamAchievementTracker.Controllers
             try
             {
                 string apiURL = $"http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key={ApiKey}&vanityurl={steamId}";
-                HttpResponseMessage response = await HttpClient.GetAsync(apiURL);
-                response.EnsureSuccessStatusCode();
-                string responseBody = await response.Content.ReadAsStringAsync();
-                // Above three lines can be replaced with new helper method below
-                // string responseBody = await client.GetStringAsync(uri);
+                string responseBody = await HttpClient.GetStringAsync(apiURL);
 
                 // gamesOwnedDetails is of JObject type
                 dynamic responseObj = JsonConvert.DeserializeObject(responseBody);
@@ -310,7 +265,6 @@ namespace SteamAchievementTracker.Controllers
             // Call asynchronous network methods in a try/catch block to handle exceptions.
             try
             {
-                //string steamId = "76561198055381702";
 
                 DebugLog($"original steamId: {steamId}");
 
@@ -330,11 +284,7 @@ namespace SteamAchievementTracker.Controllers
                 }
 
                 string apiURL = $"http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key={ApiKey}&steamid={processedSteamId}&format=json";
-                HttpResponseMessage response = await HttpClient.GetAsync(apiURL);
-                response.EnsureSuccessStatusCode();
-                string responseBody = await response.Content.ReadAsStringAsync();
-                // Above three lines can be replaced with new helper method below
-                // string responseBody = await client.GetStringAsync(uri);
+                string responseBody = await HttpClient.GetStringAsync(apiURL);
 
                 // gamesOwnedDetails is of JObject type
                 dynamic gamesOwnedDetails = JsonConvert.DeserializeObject(responseBody);
@@ -401,14 +351,9 @@ namespace SteamAchievementTracker.Controllers
         {
             try
             {
-                //string steamID = "76561198055381702";
 
                 string apiURL = $"http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?appid={appid}&key={ApiKey}&steamid={steamId}";
-                HttpResponseMessage response = await HttpClient.GetAsync(apiURL);
-                response.EnsureSuccessStatusCode();
-                string responseBody = await response.Content.ReadAsStringAsync();
-                // Above three lines can be replaced with new helper method below
-                // string responseBody = await client.GetStringAsync(uri);
+                string responseBody = await HttpClient.GetStringAsync(apiURL);
 
                 // gamesOwnedDetails is of JObject type
                 dynamic achievementList = JsonConvert.DeserializeObject(responseBody);
